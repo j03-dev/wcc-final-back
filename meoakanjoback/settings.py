@@ -46,6 +46,8 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
+CORS_ALLOW_ORIGIN = True
+
 # Application definition
 
 INSTALLED_APPS = [

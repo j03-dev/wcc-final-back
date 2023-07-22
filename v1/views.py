@@ -30,7 +30,7 @@ class UserView(APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response(
-                "token is invalide or user is not connected", status=status.HTTP_400_BAD_REQUEST
+                "token is invalide or user is not connected", status=status.HTTP_403_FORBIDDEN
             )
 
     def post(self, request):
