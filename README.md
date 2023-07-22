@@ -2,7 +2,7 @@
 
 ## Endpoints
 
-- `POST /login`
+- `POST api/v1/user/login`
 
 Request : 
 ```
@@ -19,7 +19,7 @@ Response :
 }
 ```
 
-- `POST /register`
+- `POST api/v1/user/register`
 
 Request
 ```
@@ -58,7 +58,7 @@ Response
 ```
 ```
 
-- `POST /clothes`
+- `POST /api/v1/clothes`
     - Add a new one
     - Need auth
 
@@ -91,7 +91,7 @@ Response
     "new_cloth_id": 123,
 }
 ```
-- `GET /clothes`
+- `GET /api/v1/clothes`
     - Get all clothes of an user
     - Need token
 
