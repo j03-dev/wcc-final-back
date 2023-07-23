@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from v1.models import Clothing, Color
+from v1.models import Clothing
 
 
 class UserSerializer(serializers.Serializer):
@@ -69,12 +69,6 @@ class ClotheSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ColorSerliazer(serializers.ModelSerializer):
-    class Meta:
-        model = Color
-        fields = ["hexcode"]
-
-
 class ClotheView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -97,10 +91,9 @@ class ClotheView(APIView):
                 type=clothe_serializer.validated_data["type"],
                 category=clothe_serializer.validated_data["category"],
                 hot=clothe_serializer.validated_data["hot"],
+                hexcode=clothe_serializer.validated_data["hexcode"],
                 user_id=user
             )
-            Color.objects.create(
-                hexcode=clothe_serializer.validated_data["hexcode"], clothing_id=clothe)
             return Response({
                 "success": True,
                 "new_cloth_id": clothe.id
@@ -113,12 +106,19 @@ def delete_clothe(request, pk):
     if request.method == 'DELETE':
         if request.user.is_authenticated:
             user = User.objects.get(pk=request.user.id)
-            clothe = Clothing.objects.filter(pk=pk, user_id=user).first()
-            clothe.delete()
-            return Response({
-                "success": True,
-                "message": "Clothe deleted"
-            }, status=status.HTTP_200_OK)
+            clothes = Clothing.objects.filter(pk=pk, user_id=user)
+            if clothes.exists():
+                clothes.first().delete()
+                return Response({
+                    "success": True,
+                    "message": "Clothe deleted"
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {"success": False, "message": "Clothe doesn't not existe"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
         return Response(
             {"success": False, "message": "Clothe doesn't belong to this user"},
             status=status.HTTP_403_FORBIDDEN

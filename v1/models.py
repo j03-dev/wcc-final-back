@@ -10,10 +10,5 @@ class Clothing(models.Model):
     type = models.CharField(max_length=20, null=False)
     category = models.CharField(max_length=20, null=False)
     hot =  models.BooleanField(default=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-
-
-class Color(models.Model):
     hexcode = models.CharField(max_length=7, null=False)
-    clothing_id = models.ForeignKey(Clothing, on_delete=models.CASCADE)
-
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
