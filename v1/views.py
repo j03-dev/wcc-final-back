@@ -1,3 +1,5 @@
+import random
+from v1.gpt_api import ask_gpt
 from django.contrib.auth.models import User
 from rest_framework import serializers, status
 from rest_framework.response import Response
@@ -123,3 +125,72 @@ def delete_clothe(request, pk):
             {"success": False, "message": "Clothe doesn't belong to this user"},
             status=status.HTTP_403_FORBIDDEN
         )
+
+
+class GenerateInput(serializers.Serializer):
+    hot = serializers.BooleanField(default=True)
+    type = serializers.CharField(max_length=10)
+
+
+def select_random_clothe(category, filter_clothes):
+    response = ""
+    clothe_filter_by_category = filter_clothes.filter(category=category)
+    if clothe_filter_by_category.exists():
+        random_clothe = random.choice(clothe_filter_by_category)
+        response = ClotheSerializer(random_clothe).data
+    return response
+
+
+@api_view(['GET'])
+def generate(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            user = User.objects.get(pk=request.user.id)
+            generate_serializer = GenerateInput(data=request.data)
+            if generate_serializer.is_valid():
+                clothes = Clothing.objects.filter(user_id=user)
+                if clothes.exists():
+                    hot = generate_serializer.validated_data["hot"]
+                    type = generate_serializer.validated_data["type"]
+                    prompt = f"""
+                    i want {type} outfit and it's hot={hot}
+                    and i have {len(clothes)}
+                    """
+
+                    out_fit = {
+                        "haut": "",
+                        "bas": "",
+                        "shoe": "",
+                        "accessory": ""
+                    }
+
+                    filter_clothes = clothes.filter(
+                        user_id=user, hot=hot, type=type)
+
+                    if filter_clothes.exists():
+                        for key in out_fit:
+                            if key == "haut":
+                                out_fit["haut"] = select_random_clothe(
+                                    "haut", filter_clothes)
+                            elif key == "bas":
+                                out_fit["bas"] = select_random_clothe(
+                                    "bas", filter_clothes)
+                            elif key == "shoe":
+                                out_fit["shoe"] = select_random_clothe(
+                                    "shoe", filter_clothes)
+                            elif key == "accessory":
+                                out_fit["accessory"] = select_random_clothe(
+                                    "accessory", filter_clothes)
+
+                    gpt_response = ask_gpt(prompt)
+
+                    response = {
+                        "outfit": out_fit,
+                        "gtp_response": gpt_response
+                    }
+
+                    return Response(response, status=status.HTTP_200_OK)
+            else:
+                return Response(generate_serializer.errors, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response("user not authenticated", status=status.HTTP_403_FORBIDDEN)
