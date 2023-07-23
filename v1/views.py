@@ -165,7 +165,7 @@ def generate(request):
                     }
 
                     filter_clothes = clothes.filter(
-                        user_id=user, hot=hot, type=type)
+                        user_id=user, type=type)
 
                     if filter_clothes.exists():
                         for key in out_fit:
