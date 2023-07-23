@@ -141,9 +141,9 @@ def select_random_clothe(category, filter_clothes):
     return response
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def generate(request):
-    if request.method == "GET":
+    if request.method == "POST":
         if request.user.is_authenticated:
             user = User.objects.get(pk=request.user.id)
             generate_serializer = GenerateInput(data=request.data)
