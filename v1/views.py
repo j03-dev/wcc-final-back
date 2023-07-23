@@ -129,7 +129,7 @@ def delete_clothe(request, pk):
 
 class GenerateInput(serializers.Serializer):
     hot = serializers.BooleanField(default=True)
-    ttype = serializers.CharField()
+    type = serializers.CharField(max=255)
 
 
 def select_random_clothe(category, filter_clothes):
@@ -151,9 +151,9 @@ def generate(request):
                 clothes = Clothing.objects.filter(user_id=user)
                 if clothes.exists():
                     hot = generate_serializer.validated_data["hot"]
-                    ttype = generate_serializer.validated_data["ttype"]
+                    type = generate_serializer.validated_data["type"]
                     prompt = f"""
-                    i want {ttype} outfit and it's hot={hot}
+                    i want {type} outfit and it's hot={hot}
                     and i have {len(clothes)}
                     """
 
@@ -165,7 +165,7 @@ def generate(request):
                     }
 
                     filter_clothes = clothes.filter(
-                        user_id=user, hot=hot, type=ttype)
+                        user_id=user, hot=hot, type=type)
 
                     if filter_clothes.exists():
                         for key in out_fit:
@@ -182,11 +182,8 @@ def generate(request):
                                 out_fit["accessory"] = select_random_clothe(
                                     "accessory", filter_clothes)
 
-                    gpt_response = ask_gpt(prompt)
-
                     response = {
                         "outfit": out_fit,
-                        "gtp_response": gpt_response
                     }
 
                     return Response(response, status=status.HTTP_200_OK)
