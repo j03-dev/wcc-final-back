@@ -129,7 +129,7 @@ def delete_clothe(request, pk):
 
 class GenerateInput(serializers.Serializer):
     hot = serializers.BooleanField(default=True)
-    type = serializers.CharField(max_length=10)
+    type = serializers.CharField()
 
 
 def select_random_clothe(category, filter_clothes):
