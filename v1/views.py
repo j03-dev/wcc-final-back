@@ -129,7 +129,7 @@ def delete_clothe(request, pk):
 
 class GenerateInput(serializers.Serializer):
     hot = serializers.BooleanField(default=True)
-    type = serializers.CharField()
+    ttype = serializers.CharField()
 
 
 def select_random_clothe(category, filter_clothes):
@@ -151,9 +151,9 @@ def generate(request):
                 clothes = Clothing.objects.filter(user_id=user)
                 if clothes.exists():
                     hot = generate_serializer.validated_data["hot"]
-                    type = generate_serializer.validated_data["type"]
+                    ttype = generate_serializer.validated_data["ttype"]
                     prompt = f"""
-                    i want {type} outfit and it's hot={hot}
+                    i want {ttype} outfit and it's hot={hot}
                     and i have {len(clothes)}
                     """
 
@@ -165,7 +165,7 @@ def generate(request):
                     }
 
                     filter_clothes = clothes.filter(
-                        user_id=user, hot=hot, type=type)
+                        user_id=user, hot=hot, type=ttype)
 
                     if filter_clothes.exists():
                         for key in out_fit:
